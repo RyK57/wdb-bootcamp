@@ -14,6 +14,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center mt-6">
         <Link href="/about">About</Link>
         <Link href="/pokemon">View Pokemon</Link>
+        <Link href="/test">Backend-lecture4</Link>
       </div>
     </div>
   )
