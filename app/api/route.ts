@@ -1,25 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createPokemon } from '@/db/pokemons/actions'
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const resource = searchParams.get('resource')
-
-  if (!resource) {
-    return NextResponse.json({ error: 'Missing "resource" query param' }, { status: 400 })
-  }
-
-  const proxyParams = new URLSearchParams(Array.from(searchParams.entries())
-    .filter(([key]) => key !== 'resource'))
-
-  const pokeapiUrl = `https://pokeapi.co/api/v2/${resource}${proxyParams.toString() ? `?${proxyParams.toString()}` : ''}`
-  
+export async function POST(req: NextRequest) {
   try {
-    const pokeRes = await fetch(pokeapiUrl)
-    if (!pokeRes.ok) {
-      return NextResponse.json({ error: 'PokéAPI request failed', status: pokeRes.status }, { status: pokeRes.status })
+    const body = await req.json()
+    const { name, type } = body
+
+    if (!name) {
+      return NextResponse.json({ error: 'Missing Pokémon name' }, { status: 400 })
     }
-    const data = await pokeRes.json()
-    return NextResponse.json(data)
+
+    const newPokemon = await createPokemon({ name, type })
+
+    return NextResponse.json(newPokemon, { status: 201 })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Unknown error' }, { status: 500 })
   }
